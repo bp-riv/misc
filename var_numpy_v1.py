@@ -86,19 +86,19 @@ def test_quantile ():
 #---
 
 
-def get_var(samples : np.array, c_value : float,
-         verbose = True) -> (float, float):
+def get_var(samples : np.array, confidence : float,
+                        verbose : bool = True) -> (float, float):
     '''
     Compute the Value At Risk for a set of samples, by using its
     interpretation as quantile: VaR(c) = - QUANTILE(1 - c)
     Returns an interval where the true val is estimated to lie.
     '''
-    p = 1. - c_value
+    p = 1. - confidence
     q_low, q_up = get_quantile(samples, p, verbose = False)
     var_low = - q_up
     var_up = - q_low
     if verbose:
-        print(f"{c_value * 100}%-V@R in [{var_low:.3e}, {var_up:.3e}]")
+        print(f"{confidence * 100}%-V@R in [{var_low:.3e}, {var_up:.3e}]")
     return (var_low, var_up) 
 #---
 
@@ -120,21 +120,21 @@ def test_var ():
         if random_integers_2[nth] > 991:
             samples_2[nth] = -10_000
     # Now, the historical samples are built
-    c_value = 0.99 
-    var_low, var_high = get_var(samples_1, c_value)
+    confidence = 0.99 
+    var_low, var_high = get_var(samples_1, confidence)
     print("True value is: -1000")
     true_var = -1000.
     err_var = np.abs((var_low + var_high) / 2. - true_var)
     assert(err_var < 0.1)
 
-    var_low, var_high = get_var(samples_2, c_value)
+    var_low, var_high = get_var(samples_2, confidence)
     print("True value is: -1000")
     true_var = -1000.
     err_var = np.abs((var_low + var_high) / 2. - true_var)
     assert(err_var < 0.1)
 
     samples_3 = (samples_1 + samples_2) / 2.
-    var_low, var_high = get_var(samples_3, c_value)
+    var_low, var_high = get_var(samples_3, confidence)
     print("True value is: 4500")
     true_var = 4500
     err_var = np.abs((var_low + var_high) / 2. - true_var)
